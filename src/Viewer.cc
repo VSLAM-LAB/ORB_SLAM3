@@ -86,25 +86,25 @@ bool Viewer::ParseViewerParamFile(cv::FileStorage &fCalib, cv::FileStorage &fSet
         fps=30;
     mT = 1e3/fps;
 
-    cv::FileNode node = fCalib["Camera.width"];
+    cv::FileNode node = fCalib["Camera.w"];
     if(!node.empty())
     {
         mImageWidth = node.real();
     }
     else
     {
-        std::cerr << "*Camera.width parameter doesn't exist or is not a real number*" << std::endl;
+        std::cerr << "*Camera.w parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
 
-    node = fCalib["Camera.height"];
+    node = fCalib["Camera.h"];
     if(!node.empty())
     {
         mImageHeight = node.real();
     }
     else
     {
-        std::cerr << "*Camera.height parameter doesn't exist or is not a real number*" << std::endl;
+        std::cerr << "*Camera.h parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
 

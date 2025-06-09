@@ -108,7 +108,7 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
         std::cout << "Camera " << pCam->GetId();
         if(pCam->GetType() == GeometricCamera::CAM_PINHOLE)
         {
-            std::cout << " is pinhole" << std::endl;
+            std::cout << " is PINHOLE" << std::endl;
         }
         else if(pCam->GetType() == GeometricCamera::CAM_FISHEYE)
         {
@@ -625,8 +625,8 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
     cout << endl << "Camera Parameters: " << endl;
     bool b_miss_params = false;
 
-    string sCameraName = fSettings["Camera.type"];
-    if(sCameraName == "PinHole")
+    string sCameraName = fSettings["Camera.model"];
+    if(sCameraName == "PINHOLE")
     {
         float fx, fy, cx, cy;
         mImageScale = 1.f;
@@ -754,7 +754,7 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
         mpCamera = mpAtlas->AddCamera(mpCamera);
 
-        std::cout << "- Camera: Pinhole" << std::endl;
+        std::cout << "- Camera: PINHOLE" << std::endl;
         std::cout << "- Image scale: " << mImageScale << std::endl;
         std::cout << "- fx: " << fx << std::endl;
         std::cout << "- fy: " << fy << std::endl;
@@ -1162,8 +1162,7 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
     cout << "- fps: " << fps << endl;
 
-
-    int nRGB = fSettings["Camera.RGB"];
+    int nRGB = fSettings["Camera.RGB"].empty() ? 1 : (int)fSettings["Camera.RGB"];
     mbRGB = nRGB;
 
     if(mbRGB)
