@@ -55,7 +55,7 @@ namespace ORB_SLAM3 {
         /*
          * Constructor from file
          */
-        Settings(const std::string &configFile, const int& sensor);
+        Settings(const std::string &calibFile, const std::string &configFile, const int& sensor);
 
         /*
          * Ostream operator overloading to dump settings to the terminal

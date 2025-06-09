@@ -41,7 +41,9 @@ namespace ORB_SLAM3
 {
 
 
-Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Atlas *pAtlas, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, Settings* settings, const string &_nameSeq):
+Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Atlas *pAtlas, KeyFrameDatabase* pKFDB, 
+    const string &strCalibPath, const string &strSettingPath, 
+    const int sensor, Settings* settings, const string &_nameSeq):
     mState(NO_IMAGES_YET), mSensor(sensor), mTrackedFr(0), mbStep(false),
     mbOnlyTracking(false), mbMapUpdated(false), mbVO(false), mpORBVocabulary(pVoc), mpKeyFrameDB(pKFDB),
     mbReadyToInitializate(false), mpSystem(pSys), mpViewer(NULL), bStepByStep(false),
@@ -53,9 +55,10 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
         newParameterLoader(settings);
     }
     else{
+        cv::FileStorage fCalib(strCalibPath, cv::FileStorage::READ);
         cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
 
-        bool b_parse_cam = ParseCamParamFile(fSettings);
+        bool b_parse_cam = ParseCamParamFile(fCalib);
         if(!b_parse_cam)
         {
             std::cout << "*Error with the camera parameters in the config file*" << std::endl;
@@ -71,7 +74,7 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
         bool b_parse_imu = true;
         if(sensor==System::IMU_MONOCULAR || sensor==System::IMU_STEREO || sensor==System::IMU_RGBD)
         {
-            b_parse_imu = ParseIMUParamFile(fSettings);
+            b_parse_imu = ParseIMUParamFile(fCalib);
             if(!b_parse_imu)
             {
                 std::cout << "*Error with the IMU parameters in the config file*" << std::endl;

@@ -79,6 +79,12 @@ int main(int argc, char *argv[])
             std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Path to sequence = " << sequence_path << std::endl;
             continue;
         }
+        if (arg.find("calibration_yaml:") != std::string::npos) {
+            removeSubstring(arg, "calibration_yaml:");
+            calibration_yaml =  arg;
+            std::cout << "[mono_vslamlab.cpp] Path to calibration.yaml = " << calibration_yaml << std::endl;
+            continue;
+        }
         if (arg.find("rgb_txt:") != std::string::npos) {
             removeSubstring(arg, "rgb_txt:");
             rgb_txt =  arg;
@@ -174,7 +180,7 @@ int main(int argc, char *argv[])
     cout.precision(17);
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(vocabulary,settings_yaml,ORB_SLAM3::System::IMU_MONOCULAR, verbose);
+    ORB_SLAM3::System SLAM(vocabulary,calibration_yaml,settings_yaml,ORB_SLAM3::System::IMU_MONOCULAR, verbose);
     float imageScale = SLAM.GetImageScale();
 
     double t_resize = 0.f;

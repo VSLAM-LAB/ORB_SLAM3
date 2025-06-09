@@ -124,11 +124,21 @@ namespace ORB_SLAM3 {
         }
     }
 
-    Settings::Settings(const std::string &configFile, const int& sensor) :
+    Settings::Settings(const std::string &calibFile, const std::string &configFile, const int& sensor) :
     bNeedToUndistort_(false), bNeedToRectify_(false), bNeedToResize1_(false), bNeedToResize2_(false) {
         sensor_ = sensor;
 
         //Open settings file
+        cv::FileStorage fCalib(calibFile, cv::FileStorage::READ);
+        if (!fCalib.isOpened()) {
+            cerr << "[ERROR]: could not open calibration file at: " << calibFile << endl;
+            cerr << "Aborting..." << endl;
+
+            exit(-1);
+        }
+        else{
+            cout << "Loading settings from " << configFile << endl;
+        }
         cv::FileStorage fSettings(configFile, cv::FileStorage::READ);
         if (!fSettings.isOpened()) {
             cerr << "[ERROR]: could not open configuration file at: " << configFile << endl;
@@ -141,26 +151,26 @@ namespace ORB_SLAM3 {
         }
 
         //Read first camera
-        readCamera1(fSettings);
+        readCamera1(fCalib);
         cout << "\t-Loaded camera 1" << endl;
 
         //Read second camera if stereo (not rectified)
         if(sensor_ == System::STEREO || sensor_ == System::IMU_STEREO){
-            readCamera2(fSettings);
+            readCamera2(fCalib);
             cout << "\t-Loaded camera 2" << endl;
         }
 
         //Read image info
-        readImageInfo(fSettings);
+        readImageInfo(fCalib);
         cout << "\t-Loaded image info" << endl;
 
         if(sensor_ == System::IMU_MONOCULAR || sensor_ == System::IMU_STEREO || sensor_ == System::IMU_RGBD){
-            readIMU(fSettings);
+            readIMU(fCalib);
             cout << "\t-Loaded IMU calibration" << endl;
         }
 
         if(sensor_ == System::RGBD || sensor_ == System::IMU_RGBD){
-            readRGBD(fSettings);
+            readRGBD(fCalib);
             cout << "\t-Loaded RGB-D calibration" << endl;
         }
 
