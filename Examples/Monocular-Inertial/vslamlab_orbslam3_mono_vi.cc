@@ -31,10 +31,21 @@
 
 using namespace std;
 
+namespace ORB_SLAM3{
+    using Seconds = double;
+}
+
 void LoadImages(const string &strImagePath, const string &strPathTimes,
                 vector<string> &vstrImages, vector<double> &vTimeStamps);
 
 void LoadIMU(const string &strImuPath, vector<double> &vTimeStamps, vector<cv::Point3f> &vAcc, vector<cv::Point3f> &vGyro);
+
+std::string paddingZeros(const std::string& number, const size_t numberOfZeros = 5){
+    std::string zeros{};
+    for(size_t iZero{}; iZero < numberOfZeros - number.size(); ++iZero)
+        zeros += "0";
+    return (zeros + number);
+}
 
 void removeSubstring(std::string& str, const std::string& substring) {
     size_t pos;
@@ -47,26 +58,17 @@ double ttrack_tot = 0;
 int main(int argc, char *argv[])
 {
 
-    if(argc < 5)
-    {
-        cerr << endl << "Usage: ./mono_inertial_euroc path_to_vocabulary path_to_settings path_to_sequence_folder_1 path_to_times_file_1 (path_to_image_folder_2 path_to_times_file_2 ... path_to_image_folder_N path_to_times_file_N) " << endl;
-        return 1;
-    }
-
     const int num_seq = 1;
-    /*cout << "num_seq = " << num_seq << endl;
-    bool bFileName= (((argc-3) % 2) == 1);
-    string file_name;
-    if (bFileName)
-    {
-        file_name = string(argv[argc-1]);
-        cout << "file name: " << file_name << endl;
-    }*/
 
     // ORB_SLAM3  inputs
     string sequence_path;
+    string calibration_yaml;
     string rgb_txt;
-    string settings_yaml{"vslamlab_orbslam3-dev_settings.yaml"};
+    string exp_folder;
+    string exp_id{"0"};
+    string settings_yaml{"orbslam2_settings.yaml"};
+    bool verbose{true};
+
     string vocabulary{"Vocabulary/ORBvoc.txt"};
 
     for (int i = 0; i < argc; ++i) {
@@ -95,14 +97,32 @@ int main(int argc, char *argv[])
             std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Path to settings_yaml = " << settings_yaml << std::endl;
             continue;
         }
+        if (arg.find("exp_folder:") != std::string::npos) {
+            removeSubstring(arg, "exp_folder:");
+            exp_folder =  arg;
+            std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Path to exp_folder = " << exp_folder << std::endl;
+            continue;
+        }
+        if (arg.find("exp_id:") != std::string::npos) {
+            removeSubstring(arg, "exp_id:");
+            exp_id =  arg;
+            std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Exp id = " << exp_id << std::endl;
+            continue;
+        }
+        if (arg.find("verbose:") != std::string::npos) {
+            removeSubstring(arg, "verbose:");
+            verbose = bool(std::stoi(arg));
+            std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Activate Visualization = " << verbose << std::endl;
+            continue;
+        }
     }
 
     // Load all sequences:
     int seq;
     vector< vector<string> > vstrImageFilenames;
-    vector< vector<double> > vTimestampsCam;
+    vector< vector<ORB_SLAM3::Seconds>> vTimestampsCam;
     vector< vector<cv::Point3f> > vAcc, vGyro;
-    vector< vector<double> > vTimestampsImu;
+    vector< vector<double>> vTimestampsImu;
     vector<int> nImages;
     vector<int> nImu;
     vector<int> first_imu(num_seq,0);
@@ -120,15 +140,9 @@ int main(int argc, char *argv[])
     {
         cout << "Loading images for sequence " << seq << "...";
 
-        //string pathSeq(argv[(2*seq) + 3]);
-        //string pathSeq = sequence_path;
-        //string pathTimeStamps(argv[(2*seq) + 4]);
-        //string pathTimeStamps = sequence_path + "/mav0/cam0/times.txt";
-
-        string pathCam0 = sequence_path + "/rgb";
         string pathImu = sequence_path + "/imu.csv";
 
-        LoadImages(pathCam0, rgb_txt, vstrImageFilenames[seq], vTimestampsCam[seq]);
+        LoadImages(sequence_path, rgb_txt, vstrImageFilenames[seq], vTimestampsCam[seq]);
         cout << "LOADED!" << endl;
 
         cout << "Loading IMU for sequence " << seq << "...";
@@ -160,7 +174,7 @@ int main(int argc, char *argv[])
     cout.precision(17);
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM3::System SLAM(vocabulary,settings_yaml,ORB_SLAM3::System::IMU_MONOCULAR, true);
+    ORB_SLAM3::System SLAM(vocabulary,settings_yaml,ORB_SLAM3::System::IMU_MONOCULAR, verbose);
     float imageScale = SLAM.GetImageScale();
 
     double t_resize = 0.f;
@@ -209,7 +223,6 @@ int main(int argc, char *argv[])
 
             if(ni>0)
             {
-                // cout << "t_cam " << tframe << endl;
 
                 while(vTimestampsImu[seq][first_imu[seq]]<=vTimestampsCam[seq][ni])
                 {
@@ -223,8 +236,7 @@ int main(int argc, char *argv[])
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
             // Pass the image to the SLAM system
-            // cout << "tframe = " << tframe << endl;
-            SLAM.TrackMonocular(im,tframe,vImuMeas); // TODO change to monocular_inertial
+            SLAM.TrackMonocular(im,tframe,vImuMeas); 
 
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 
@@ -235,7 +247,6 @@ int main(int argc, char *argv[])
 
             double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
             ttrack_tot += ttrack;
-            // std::cout << "ttrack: " << ttrack << std::endl;
 
             vTimesTrack[ni]=ttrack;
 
@@ -261,41 +272,34 @@ int main(int argc, char *argv[])
     SLAM.Shutdown();
 
     // Save camera trajectory
-    // if (bFileName)
-    // {
-    //     const string kf_file =  "kf_" + string(argv[argc-1]) + ".txt";
-    //     const string f_file =  "f_" + string(argv[argc-1]) + ".txt";
-    //     SLAM.SaveTrajectoryEuRoC(f_file);
-    //     SLAM.SaveKeyFrameTrajectoryEuRoC(kf_file);
-    // }
-    // else
-    // {
-    //     SLAM.SaveTrajectoryEuRoC("CameraTrajectory.txt");
-    //     SLAM.SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
-    // }
+    string resultsPath_expId = exp_folder + "/" + paddingZeros(exp_id);
+    SLAM.SaveTrajectoryEuRoC(resultsPath_expId + "_" + "CameraTrajectory.txt");
+    SLAM.SaveKeyFrameTrajectoryTUM(resultsPath_expId + "_" + "KeyFrameTrajectory.txt");
 
     return 0;
 }
 
-void LoadImages(const string &strImagePath, const string &strPathTimes,
-                vector<string> &vstrImages, vector<double> &vTimeStamps)
+void LoadImages(const string &pathToSequence, const string &rgb_txt,
+    vector<string> &imageFilenames, vector<ORB_SLAM3::Seconds> &timestamps)
 {
-    ifstream fTimes;
-    fTimes.open(strPathTimes.c_str());
-    vTimeStamps.reserve(5000);
-    vstrImages.reserve(5000);
-    while(!fTimes.eof())
+    ifstream times;
+    times.open(rgb_txt.c_str());
+
+    while(!times.eof())
     {
         string s;
-        getline(fTimes,s);
+        getline(times,s);
         if(!s.empty())
         {
             stringstream ss;
             ss << s;
-            vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
-            double t;
+
+            ORB_SLAM3::Seconds t;
+            string sRGB;
             ss >> t;
-            vTimeStamps.push_back(t/1e9);
+            timestamps.push_back(t);
+            ss >> sRGB;
+            imageFilenames.push_back(pathToSequence + "/" +  sRGB);
 
         }
     }
