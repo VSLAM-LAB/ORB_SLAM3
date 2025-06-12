@@ -137,7 +137,7 @@ namespace ORB_SLAM3 {
             exit(-1);
         }
         else{
-            cout << "Loading settings from " << configFile << endl;
+            cout << "Loading settings from " << calibFile << endl;
         }
         cv::FileStorage fSettings(configFile, cv::FileStorage::READ);
         if (!fSettings.isOpened()) {
