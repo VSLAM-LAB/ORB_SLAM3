@@ -54,8 +54,8 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 # Config file for find_package support
-# configure_file(DBoW2/DBoW2.cmake.in
-#         "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
+configure_file(DBoW2/DBoW2.cmake.in
+        "${PROJECT_BINARY_DIR}/DBoW2Config.cmake" @ONLY)
 
 # Install the shared library
 install(TARGETS ${PROJECT_NAME}

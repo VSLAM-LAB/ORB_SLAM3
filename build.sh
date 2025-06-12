@@ -68,60 +68,20 @@ library_name="g2o"
 source_folder="${LIBRARY_DIR}/Thirdparty/${library_name}"
 build_library ${library_name} ${source_folder} ${verbose} ${force_build}
 
-## Build g2o
+## Build Sophus
 library_name="Sophus"
 source_folder="${LIBRARY_DIR}/Thirdparty/${library_name}"
 build_library ${library_name} ${source_folder} ${verbose} ${force_build}
 
-## Build ORB-SLAM2
-library_name="ORB-SLAM2"
+## Build ORB-SLAM3
+library_name="ORB-SLAM3"
 source_folder="${LIBRARY_DIR}"
 build_library ${library_name} ${source_folder} ${verbose} ${force_build}
 
 ## Uncompress vocabulary
-echo "[ORB-SLAM2][build.sh] Uncompress vocabulary ... "
+echo "[ORB-SLAM3][build.sh] Uncompress vocabulary ... "
 vocabulary_folder="${LIBRARY_DIR}/Vocabulary"
 if [ ! -f "${vocabulary_folder}/ORBvoc.txt" ]; then
 	tar -xf "${LIBRARY_DIR}/Vocabulary/ORBvoc.txt.tar.gz" -C "${LIBRARY_DIR}/Vocabulary"
 fi
 
-# echo "Configuring and building Thirdparty/DBoW2 ..."
-
-# cd Thirdparty/DBoW2
-# mkdir build
-# cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# make -j
-
-# cd ../../g2o
-
-# echo "Configuring and building Thirdparty/g2o ..."
-
-# mkdir build
-# cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# make -j
-
-# cd ../../Sophus
-
-# echo "Configuring and building Thirdparty/Sophus ..."
-
-# mkdir build
-# cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# make -j
-
-# cd ../../../
-
-# echo "Uncompress vocabulary ..."
-
-# cd Vocabulary
-# tar -xf ORBvoc.txt.tar.gz
-# cd ..
-
-# echo "Configuring and building ORB_SLAM3 ..."
-
-# mkdir build
-# cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-# make -j4
