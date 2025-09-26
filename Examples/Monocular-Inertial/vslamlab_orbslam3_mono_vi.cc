@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     // ORB_SLAM3  inputs
     string sequence_path;
     string calibration_yaml;
-    string rgb_txt;
+    string rgb_csv;
     string exp_folder;
     string exp_id{"0"};
     string settings_yaml{"orbslam2_settings.yaml"};
@@ -85,10 +85,10 @@ int main(int argc, char *argv[])
             std::cout << "[mono_vslamlab.cpp] Path to calibration.yaml = " << calibration_yaml << std::endl;
             continue;
         }
-        if (arg.find("rgb_txt:") != std::string::npos) {
-            removeSubstring(arg, "rgb_txt:");
-            rgb_txt =  arg;
-            std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Path to rgb_txt = " << rgb_txt << std::endl;
+        if (arg.find("rgb_csv:") != std::string::npos) {
+            removeSubstring(arg, "rgb_csv:");
+            rgb_csv =  arg;
+            std::cout << "[vslamlab_orbslam3_mono_vi.cpp] Path to rgb_csv = " << rgb_csv << std::endl;
             continue;
         }
         if (arg.find("vocabulary:") != std::string::npos) {
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 
         string pathImu = sequence_path + "/imu.csv";
 
-        LoadImages(sequence_path, rgb_txt, vstrImageFilenames[seq], vTimestampsCam[seq]);
+        LoadImages(sequence_path, rgb_csv, vstrImageFilenames[seq], vTimestampsCam[seq]);
         cout << "LOADED!" << endl;
 
         cout << "Loading IMU for sequence " << seq << "...";
@@ -158,7 +158,6 @@ int main(int argc, char *argv[])
         nImages[seq] = vstrImageFilenames[seq].size();
         tot_images += nImages[seq];
         nImu[seq] = vTimestampsImu[seq].size();
-
         if((nImages[seq]<=0)||(nImu[seq]<=0))
         {
             cerr << "ERROR: Failed to load images or IMU for sequence" << seq << endl;
@@ -166,11 +165,9 @@ int main(int argc, char *argv[])
         }
 
         // Find first imu to be considered, supposing imu measurements start first
-
         while(vTimestampsImu[seq][first_imu[seq]]<=vTimestampsCam[seq][0])
             first_imu[seq]++;
         first_imu[seq]--; // first imu measurement to be considered
-
     }
 
     // Vector for tracking time statistics
@@ -285,28 +282,36 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void LoadImages(const string &pathToSequence, const string &rgb_txt,
+void LoadImages(const string &pathToSequence, const string &rgb_csv,
     vector<string> &imageFilenames, vector<ORB_SLAM3::Seconds> &timestamps)
 {
-    ifstream times;
-    times.open(rgb_txt.c_str());
+    imageFilenames.clear();
+    timestamps.clear();
 
-    while(!times.eof())
-    {
-        string s;
-        getline(times,s);
-        if(!s.empty())
-        {
-            stringstream ss;
-            ss << s;
+    std::ifstream in(rgb_csv);
 
-            ORB_SLAM3::Seconds t;
-            string sRGB;
-            ss >> t;
+    std::string line;
+
+    // Drop the header 
+    if (!std::getline(in, line)) return;
+
+    // Read data lines
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+        if (!line.empty() && line.back() == '\r') line.pop_back(); // handle CRLF
+
+        // Replace commas with spaces so operator>> splits cleanly
+        std::replace(line.begin(), line.end(), ',', ' ');
+
+        std::stringstream ss(line);
+
+        ORB_SLAM3::Seconds t;
+        std::string rel_rgb_path;
+
+        // Extract the first two columns (timestamp and rgb path). Ignore the rest.
+        if (ss >> t && ss >> rel_rgb_path) {
             timestamps.push_back(t);
-            ss >> sRGB;
-            imageFilenames.push_back(pathToSequence + "/" +  sRGB);
-
+            imageFilenames.push_back(pathToSequence + "/" + rel_rgb_path);
         }
     }
 }
@@ -319,13 +324,14 @@ void LoadIMU(const string &strImuPath, vector<double> &vTimeStamps, vector<cv::P
     vAcc.reserve(5000);
     vGyro.reserve(5000);
 
+    // Drop the header 
+    string s;
+    if (!std::getline(fImu,s)) return;
+    
     while(!fImu.eof())
     {
-        string s;
         getline(fImu,s);
-        if (s[0] == '#')
-            continue;
-
+        
         if(!s.empty())
         {
             string item;
@@ -340,7 +346,7 @@ void LoadIMU(const string &strImuPath, vector<double> &vTimeStamps, vector<cv::P
             item = s.substr(0, pos);
             data[6] = stod(item);
 
-            vTimeStamps.push_back(data[0]/1e9);
+            vTimeStamps.push_back(data[0]);
             vAcc.push_back(cv::Point3f(data[4],data[5],data[6]));
             vGyro.push_back(cv::Point3f(data[1],data[2],data[3]));
         }

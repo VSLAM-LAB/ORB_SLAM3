@@ -625,110 +625,110 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
     cout << endl << "Camera Parameters: " << endl;
     bool b_miss_params = false;
 
-    string sCameraName = fSettings["Camera.model"];
-    if(sCameraName == "PINHOLE")
+    string sCameraName = fSettings["Camera0.model"];
+    if(sCameraName == "Pinhole")
     {
         float fx, fy, cx, cy;
         mImageScale = 1.f;
 
         // Camera calibration parameters
-        cv::FileNode node = fSettings["Camera.fx"];
+        cv::FileNode node = fSettings["Camera0.fx"];
         if(!node.empty() && node.isReal())
         {
             fx = node.real();
         }
         else
         {
-            std::cerr << "*Camera.fx parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.fx parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.fy"];
+        node = fSettings["Camera0.fy"];
         if(!node.empty() && node.isReal())
         {
             fy = node.real();
         }
         else
         {
-            std::cerr << "*Camera.fy parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.fy parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.cx"];
+        node = fSettings["Camera0.cx"];
         if(!node.empty() && node.isReal())
         {
             cx = node.real();
         }
         else
         {
-            std::cerr << "*Camera.cx parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.cx parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.cy"];
+        node = fSettings["Camera0.cy"];
         if(!node.empty() && node.isReal())
         {
             cy = node.real();
         }
         else
         {
-            std::cerr << "*Camera.cy parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.cy parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
         // Distortion parameters
-        node = fSettings["Camera.k1"];
+        node = fSettings["Camera0.k1"];
         if(!node.empty() && node.isReal())
         {
             mDistCoef.at<float>(0) = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k1 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k1 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.k2"];
+        node = fSettings["Camera0.k2"];
         if(!node.empty() && node.isReal())
         {
             mDistCoef.at<float>(1) = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k2 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k2 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.p1"];
+        node = fSettings["Camera0.p1"];
         if(!node.empty() && node.isReal())
         {
             mDistCoef.at<float>(2) = node.real();
         }
         else
         {
-            std::cerr << "*Camera.p1 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.p1 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.p2"];
+        node = fSettings["Camera0.p2"];
         if(!node.empty() && node.isReal())
         {
             mDistCoef.at<float>(3) = node.real();
         }
         else
         {
-            std::cerr << "*Camera.p2 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.p2 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.k3"];
+        node = fSettings["Camera0.k3"];
         if(!node.empty() && node.isReal())
         {
             mDistCoef.resize(5);
             mDistCoef.at<float>(4) = node.real();
         }
 
-        node = fSettings["Camera.imageScale"];
+        node = fSettings["Camera0.imageScale"];
         if(!node.empty() && node.isReal())
         {
             mImageScale = node.real();
@@ -754,7 +754,7 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
         mpCamera = mpAtlas->AddCamera(mpCamera);
 
-        std::cout << "- Camera: PINHOLE" << std::endl;
+        std::cout << "- Camera: Pinhole" << std::endl;
         std::cout << "- Image scale: " << mImageScale << std::endl;
         std::cout << "- fx: " << fx << std::endl;
         std::cout << "- fy: " << fy << std::endl;
@@ -789,94 +789,94 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
         mImageScale = 1.f;
 
         // Camera calibration parameters
-        cv::FileNode node = fSettings["Camera.fx"];
+        cv::FileNode node = fSettings["Camera0.fx"];
         if(!node.empty() && node.isReal())
         {
             fx = node.real();
         }
         else
         {
-            std::cerr << "*Camera.fx parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.fx parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
-        node = fSettings["Camera.fy"];
+        node = fSettings["Camera0.fy"];
         if(!node.empty() && node.isReal())
         {
             fy = node.real();
         }
         else
         {
-            std::cerr << "*Camera.fy parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.fy parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.cx"];
+        node = fSettings["Camera0.cx"];
         if(!node.empty() && node.isReal())
         {
             cx = node.real();
         }
         else
         {
-            std::cerr << "*Camera.cx parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.cx parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.cy"];
+        node = fSettings["Camera0.cy"];
         if(!node.empty() && node.isReal())
         {
             cy = node.real();
         }
         else
         {
-            std::cerr << "*Camera.cy parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.cy parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
         // Distortion parameters
-        node = fSettings["Camera.k1"];
+        node = fSettings["Camera0.k1"];
         if(!node.empty() && node.isReal())
         {
             k1 = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k1 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k1 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
-        node = fSettings["Camera.k2"];
+        node = fSettings["Camera0.k2"];
         if(!node.empty() && node.isReal())
         {
             k2 = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k2 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k2 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.k3"];
+        node = fSettings["Camera0.k3"];
         if(!node.empty() && node.isReal())
         {
             k3 = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k3 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k3 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.k4"];
+        node = fSettings["Camera0.k4"];
         if(!node.empty() && node.isReal())
         {
             k4 = node.real();
         }
         else
         {
-            std::cerr << "*Camera.k4 parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.k4 parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
-        node = fSettings["Camera.imageScale"];
+        node = fSettings["Camera0.imageScale"];
         if(!node.empty() && node.isReal())
         {
             mImageScale = node.real();
@@ -1017,23 +1017,23 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
             int rightLappingBegin = -1;
             int rightLappingEnd = -1;
 
-            node = fSettings["Camera.lappingBegin"];
+            node = fSettings["Camera0.lappingBegin"];
             if(!node.empty() && node.isInt())
             {
                 leftLappingBegin = node.operator int();
             }
             else
             {
-                std::cout << "WARNING: Camera.lappingBegin not correctly defined" << std::endl;
+                std::cout << "WARNING: Camera0.lappingBegin not correctly defined" << std::endl;
             }
-            node = fSettings["Camera.lappingEnd"];
+            node = fSettings["Camera0.lappingEnd"];
             if(!node.empty() && node.isInt())
             {
                 leftLappingEnd = node.operator int();
             }
             else
             {
-                std::cout << "WARNING: Camera.lappingEnd not correctly defined" << std::endl;
+                std::cout << "WARNING: Camera0.lappingEnd not correctly defined" << std::endl;
             }
             node = fSettings["Camera2.lappingBegin"];
             if(!node.empty() && node.isInt())
@@ -1135,7 +1135,7 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
     if(mSensor==System::STEREO || mSensor==System::RGBD || mSensor==System::IMU_STEREO || mSensor==System::IMU_RGBD )
     {
-        cv::FileNode node = fSettings["Camera.bf"];
+        cv::FileNode node = fSettings["Camera0.bf"];
         if(!node.empty() && node.isReal())
         {
             mbf = node.real();
@@ -1146,13 +1146,13 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
         }
         else
         {
-            std::cerr << "*Camera.bf parameter doesn't exist or is not a real number*" << std::endl;
+            std::cerr << "*Camera0.bf parameter doesn't exist or is not a real number*" << std::endl;
             b_miss_params = true;
         }
 
     }
 
-    float fps = fSettings["Camera.fps"];
+    float fps = fSettings["Camera0.fps"];
     if(fps==0)
         fps=30;
 
@@ -1162,7 +1162,7 @@ bool Tracking::ParseCamParamFile(cv::FileStorage &fSettings)
 
     cout << "- fps: " << fps << endl;
 
-    int nRGB = fSettings["Camera.RGB"].empty() ? 1 : (int)fSettings["Camera.RGB"];
+    int nRGB = fSettings["Camera0.RGB"].empty() ? 1 : (int)fSettings["Camera0.RGB"];
     mbRGB = nRGB;
 
     if(mbRGB)
@@ -3938,10 +3938,10 @@ vector<MapPoint*> Tracking::GetLocalMapMPS()
 void Tracking::ChangeCalibration(const string &strSettingPath)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
-    float fx = fSettings["Camera.fx"];
-    float fy = fSettings["Camera.fy"];
-    float cx = fSettings["Camera.cx"];
-    float cy = fSettings["Camera.cy"];
+    float fx = fSettings["Camera0.fx"];
+    float fy = fSettings["Camera0.fy"];
+    float cx = fSettings["Camera0.cx"];
+    float cy = fSettings["Camera0.cy"];
 
     mK_.setIdentity();
     mK_(0,0) = fx;
@@ -3957,11 +3957,11 @@ void Tracking::ChangeCalibration(const string &strSettingPath)
     K.copyTo(mK);
 
     cv::Mat DistCoef(4,1,CV_32F);
-    DistCoef.at<float>(0) = fSettings["Camera.k1"];
-    DistCoef.at<float>(1) = fSettings["Camera.k2"];
-    DistCoef.at<float>(2) = fSettings["Camera.p1"];
-    DistCoef.at<float>(3) = fSettings["Camera.p2"];
-    const float k3 = fSettings["Camera.k3"];
+    DistCoef.at<float>(0) = fSettings["Camera0.k1"];
+    DistCoef.at<float>(1) = fSettings["Camera0.k2"];
+    DistCoef.at<float>(2) = fSettings["Camera0.p1"];
+    DistCoef.at<float>(3) = fSettings["Camera0.p2"];
+    const float k3 = fSettings["Camera0.k3"];
     if(k3!=0)
     {
         DistCoef.resize(5);
@@ -3969,7 +3969,7 @@ void Tracking::ChangeCalibration(const string &strSettingPath)
     }
     DistCoef.copyTo(mDistCoef);
 
-    mbf = fSettings["Camera.bf"];
+    mbf = fSettings["Camera0.bf"];
 
     Frame::mbInitialComputations = true;
 }
